@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 def coluna_filtrada(df, nome_coluna):
     return df[nome_coluna].drop([0,1])
@@ -29,3 +30,30 @@ def filtragem(df, nome_coluna):
         index += 1
 
     return pd.to_numeric(dt_coluna)
+
+def toda_coluna_filtrada(df):
+    return df.drop([0,1])
+
+def toda_filtragem(df):
+    dt_coluna = toda_coluna_filtrada(df)
+
+    index = 0
+    for valor in dt_coluna.values:
+        index_valor = 0
+        for elemento in valor:
+            #if elemento is None:
+            elemento_nulo = pd.isna(elemento)
+            if elemento_nulo:
+                valor[index_valor] = 0
+                dt_coluna.loc[index + 2] = valor
+            else:
+                if isinstance(elemento, str): #Natype
+                    numero_pontos = elemento.count(".")
+                    if pd.to_numeric(numero_pontos) > 1:
+                        # mais dois porque cortei duas linhas na primeira filtragem
+                        valor[index_valor] = remover_segundo_ponto(elemento)
+                        dt_coluna.loc[index + 2] = valor
+            index_valor += 1       
+        index += 1
+
+    return dt_coluna
