@@ -50,5 +50,6 @@ def toda_filtragem(df):
                     dt_coluna.loc[index + 2] = valor
             index_valor += 1       
         index += 1
-
+    
+    dt_coluna = dt_coluna.apply(pd.to_numeric, errors='coerce')
     return dt_coluna

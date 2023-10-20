@@ -56,4 +56,12 @@ def pca(df):
     print("Matriz de dados projetada no novo espaço de dimensão: ", d) 
     print(x_pca2)
 
+    # Gráficos de dispersão para visualizar as amostras no novo espaço de componentes principais
+    plt.figure(figsize=(8, 6))
+    plt.scatter(x_pca[:, 0], x_pca[:, 1], label='Componente Principal 1 vs. Componente Principal 2')
+    plt.xlabel('Componente Principal 1')
+    plt.ylabel('Componente Principal 2')
+    plt.legend()
+    plt.show()
+
 pca(data)
