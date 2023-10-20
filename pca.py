@@ -13,42 +13,37 @@ def pca(df):
     # Matriz de covariancia
     cov_matrix = df.cov()
 
+    x_centered = cov_matrix - cov_matrix.mean(axis=0)
+    u, s, vt = np.linalg.svd(x_centered)
+    c1 = vt.T[:, 0]
+    c2 = vt.T[:, 1]
+
+    w2 = vt.T[:, :2]
+    x2d = x_centered.dot(w2)
+    print("Redução da dimensão em 2: ")
+    print(x2d)
+
     # Autovalores e Autovetores da matriz de covariancia
     autovalores, autovetores = np.linalg.eig(cov_matrix)
 
-    # Variancia explicada de acordo com a quantidade de autovetores
-    variancia_total = autovalores.sum()
-    variancia_explicada = autovalores / variancia_total
-
-    # Matriz de autovetores a matriz dos dados originais, escolhi 4 componentes principais
-    pca = PCA(n_components=4)
-    x_pca = pca.fit_transform(df) 
-    """""
+    # Matriz de autovetores a matriz dos dados originais, escolhi 2 componentes principais
+    pca = PCA(n_components=2)
+    x_pca = pca.fit_transform(cov_matrix) 
     print("Matriz de dados projetada no novo espaço: ") 
     print(x_pca)
+
+    # Variancia explicada de acordo com a quantidade de autovetores
+    var_exp = pca.explained_variance_ratio_
     print("Variância explicada por cada componente principal: ")
-    print(variancia_explicada)
-    """
-    column_names = df.columns
-    components = pca.components_ # Autovetores (componentes principais)
+    print(var_exp)
 
-    # Crie gráficos de barras para visualizar a contribuição de cada característica em cada componente principal
-    for i in range(len(components)):
-        plt.bar(column_names, components[i])
-        plt.title(f'Contribuição das Características na Componente Principal {i + 1}')
-        plt.xlabel('Características')
-        plt.ylabel('Contribuição')
-        plt.xticks(rotation=45)
-        plt.show()
-
-    # Crie gráficos de dispersão para visualizar as amostras no novo espaço de componentes principais
-    plt.figure(figsize=(8, 6))
-    plt.scatter(x_pca[:, 0], x_pca[:, 1], label='Componente Principal 1 vs. Componente Principal 2')
-    plt.xlabel('Componente Principal 1')
-    plt.ylabel('Componente Principal 2')
-    plt.legend()
-    plt.show()
-
-
+    pca2 = PCA()
+    pca2.fit(cov_matrix)
+    cumsum = np.cumsum(var_exp)
+    d = np.argmax(cumsum >= 0.95) + 1
+    pca2 = PCA(n_components=d)
+    x_pca2 = pca2.fit_transform(cov_matrix) 
+    print("Matriz de dados projetada no novo espaço de dimensão: ", d) 
+    print(x_pca2)
 
 pca(data)
