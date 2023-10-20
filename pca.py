@@ -25,6 +25,10 @@ def pca(df):
 
     # Autovalores e Autovetores da matriz de covariancia
     autovalores, autovetores = np.linalg.eig(cov_matrix)
+    print("Autovalores: ")
+    print(autovalores)
+    print("Autovetores: ")
+    print(autovetores)
 
     # Matriz de autovetores a matriz dos dados originais, escolhi 2 componentes principais
     pca = PCA(n_components=2)
@@ -33,6 +37,12 @@ def pca(df):
     print(x_pca)
 
     # Variancia explicada de acordo com a quantidade de autovetores
+    variance_explained = []
+    for i in autovalores:
+        variance_explained.append((i/sum(autovalores))*100)
+    print("Variância explicada de acordo com a quantidade de autovetores: ")
+    print(variance_explained)
+
     var_exp = pca.explained_variance_ratio_
     print("Variância explicada por cada componente principal: ")
     print(var_exp)
