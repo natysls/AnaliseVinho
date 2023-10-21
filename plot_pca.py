@@ -2,10 +2,15 @@ import pandas as pd
 import numpy as np
 import filter
 import matplotlib.pyplot as plt
+from skimage import io
 
 data = pd.read_csv('wine.csv')
 data.replace("?", pd.NA, inplace=True)
 df = filter.toda_filtragem(data)
+"""" # Para se usar na imagem
+imagem = io.imread('digital.jpeg')
+df = imagem.reshape(-1, imagem.shape[-1])
+"""
 
 autovalores_experimentos = []
 autovetores_experimentos = []
