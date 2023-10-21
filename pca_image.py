@@ -10,7 +10,13 @@ def recontruir_imagem():
     imagem_achatada = imagem.reshape(-1, imagem.shape[-1]) # Para calcular matriz de covariancia
     cov_matrix = np.cov(imagem_achatada, rowvar=False)
     autovalores, autovetores = np.linalg.eig(cov_matrix)
-    variância_explicada = np.cumsum(autovalores) / np.sum(autovalores)
+    variancia_explicada = np.cumsum(autovalores) / np.sum(autovalores)
+    print("Autovalores:")
+    print(autovalores)
+    print("Autovetores:")
+    print(autovetores)
+    print("Variância Explicada: ")
+    print(variancia_explicada)
 
     plt.figure(figsize=(10, 5))
     plt.subplot(2, 5, 1)
