@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 def coluna_filtrada(df, nome_coluna):
     return df[nome_coluna].drop([0,1])
@@ -53,3 +54,11 @@ def toda_filtragem(df):
     
     dt_coluna = dt_coluna.apply(pd.to_numeric, errors='coerce')
     return dt_coluna
+
+def formatar_em_numero(x):
+    x_numerico = []
+    for valor in x:
+        numero_inteiro = int(valor)
+        x_numerico.append(numero_inteiro)
+    x_numerico = np.array(x_numerico) 
+    return x_numerico
