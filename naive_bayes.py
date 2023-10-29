@@ -3,6 +3,7 @@ import numpy as np
 import random
 import filter
 import matplotlib.pyplot as plt
+import seaborn as sns
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from sklearn.naive_bayes import GaussianNB, MultinomialNB, BernoulliNB
@@ -13,13 +14,14 @@ data.replace("?", pd.NA, inplace=True)
 data = filter.toda_filtragem(data)
 
 classes = np.array(pd.unique(data[data.columns[-1]]),dtype=str)
-print("Número de linhas e colunas de uma matriz de atributos: ", data.shape)
-atributos = list(data.columns)
 
 data = data.to_numpy()
 nrow, ncol = data.shape
 X = data[:,0:ncol-1]
 y = data[:,-1]
+
+sns.displot(y, kde=True)
+plt.show()
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
 
@@ -32,11 +34,13 @@ def probabilidade_gaussiana(y, z):
     return prob
 
 def probabilidade_multinomial(y, z):
-    prob = 1
+    log_prob = 0.0
+    alpha = 1.0
     for j in np.arange(0, z.shape[1]):
         count_y = (z[:, j] == y[j]).sum()
-        prob = prob * count_y / len(z)
-    return prob
+        prob = (count_y + alpha) / (len(z) + alpha * z.shape[1])
+        log_prob += np.log(prob)
+    return log_prob
 
 def probabilidade_bernoulli(y, z):
     prob = 1
