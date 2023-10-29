@@ -62,3 +62,11 @@ def formatar_em_numero(x):
         x_numerico.append(numero_inteiro)
     x_numerico = np.array(x_numerico) 
     return x_numerico
+
+def formatar_em_string(x):
+    x_string = []
+    for valor in x:
+        palavra = str(valor)
+        x_string.append(palavra)
+    x_string = np.array(x_string) 
+    return x_string
