@@ -4,6 +4,7 @@ import filter
 import matplotlib.pyplot as plt
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
 from sklearn import tree
 
 data = pd.read_csv('wine.csv')
@@ -25,9 +26,11 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_
 
 arvore_decisao_entropia = DecisionTreeClassifier(criterion='entropy')
 arvore_decisao_entropia.fit(X_test, y_test)
-print("Entropia: ", arvore_decisao_entropia.feature_importances_)
-previsoes_entropia = arvore_decisao_entropia.predict([[13.39, 1.77, 0.92], [13.62, 4.95, 0.91]])
-print("Previsões Entropia: ", previsoes_entropia)
+print("Melhores features para Entropia: ", arvore_decisao_entropia.feature_importances_)
+y_pred_entropia = arvore_decisao_entropia.predict(X_test)
+score_entropia = accuracy_score(y_test, y_pred_entropia)
+print(f"Entropia, Acurácia = {score_entropia:.2f}")
+
 figura, eixos = plt.subplots(nrows=1, ncols=1, figsize=(10,10))
 tree.plot_tree(arvore_decisao_entropia, feature_names=previsores, class_names=arvore_decisao_entropia.classes_, filled=True)
 plt.show()
@@ -35,9 +38,10 @@ plt.show()
 
 arvore_decisao_gini = DecisionTreeClassifier(criterion='gini')
 arvore_decisao_gini.fit(X_test, y_test)
-print("Gini: ", arvore_decisao_gini.feature_importances_)
-previsoes_gini = arvore_decisao_entropia.predict([[13.39, 1.77, 0.92], [13.62, 4.95, 0.91]])
-print("Previsões Gini: ", previsoes_gini)
+print("Melhores features para Gini: ", arvore_decisao_gini.feature_importances_)
+y_pred_gini = arvore_decisao_gini.predict(X_test)
+score_gini = accuracy_score(y_test, y_pred_gini)
+print(f"Gini, Acurácia = {score_gini:.2f}")
 
 figura, eixos = plt.subplots(nrows=1, ncols=1, figsize=(10,10))
 tree.plot_tree(arvore_decisao_gini, feature_names=previsores, class_names=arvore_decisao_gini.classes_, filled=True)
