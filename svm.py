@@ -1,9 +1,11 @@
 # Importar bibliotecas
 import numpy as np
 import pandas as pd
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.svm import SVC
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+import matplotlib.pyplot as plt
+from sklearn import preprocessing
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_curve, auc
 import filter
 
 data = pd.read_csv('wine.csv')
@@ -27,6 +29,26 @@ def validacao(df_y_test, df_y_pred):
     print(f'Recall: {recall:.4f}')
     print(f'F-Score: {f1:.4f}\n')
 
+def curva_roc(model, df_X, df_y, df_X_test, df_y_test):
+    probabilidade_positivo_classe = model.predict_proba(df_X_test)
+    y_test_binarized = preprocessing.label_binarize(df_y_test, classes=np.unique(df_y_test))
+    taxa_fpr, taxa_tpr, thresholds = roc_curve(y_test_binarized, probabilidade_positivo_classe[:,1])
+    auc_score = auc(taxa_fpr, taxa_tpr)
+
+    cross_val_results = cross_val_score(model, df_X, df_y, cv=5, scoring='accuracy')
+    print("Resultados da Validacao Cruzada:", cross_val_results)
+    print("Precisão Média: {:.2f}%".format(cross_val_results.mean() * 100))
+    print("Acurácia da área sob a curva (ROC):", auc_score)
+    print("\n")
+
+    plt.plot(taxa_fpr, taxa_tpr, color='darkorange', lw=2, label=f'AUC = {auc_score:.2f}')
+    plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
+    plt.xlabel('Taxa de Falsos Positivos')
+    plt.ylabel('Taxa de Verdadeiros Positivos')
+    plt.title('Curva ROC')
+    plt.legend()
+    plt.show()
+
 valores_C = [0.1, 1, 10]
 valores_gamma = [0.01, 0.1, 1]
 
@@ -38,18 +60,20 @@ for kernel in kernels:
         
         if kernel in ['rbf', 'poly']:
             for gamma in valores_gamma:
-                modelo = SVC(kernel=kernel, C=C, gamma=gamma)
+                modelo = SVC(kernel=kernel, C=C, gamma=gamma, probability=True)
                 modelo.fit(X_train, y_train)
                 y_pred = modelo.predict(X_test)
 
                 print(f"C={C}, gamma={gamma}:")
                 validacao(y_test, y_pred)
+                curva_roc(modelo, X, y, X_test, y_test)
         else:
-            modelo = SVC(kernel=kernel, C=C)
+            modelo = SVC(kernel=kernel, C=C, probability=True)
             modelo.fit(X_train, y_train)
             y_pred = modelo.predict(X_test)
 
             print(f"C={C}:")
             validacao(y_test, y_pred)
+            curva_roc(modelo, X, y, X_test, y_test)
 
 
