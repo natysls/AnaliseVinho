@@ -32,12 +32,8 @@ def validacao(df_y_test, df_y_pred):
 def curva_roc(model, df_X, df_y, df_X_test, df_y_test):
     probabilidade_positivo_classe = model.predict_proba(df_X_test)
     y_test_binarized = preprocessing.label_binarize(df_y_test, classes=np.unique(df_y_test))
-    taxa_fpr, taxa_tpr, thresholds = roc_curve(y_test_binarized, probabilidade_positivo_classe[:,1])
+    taxa_fpr, taxa_tpr, thresholds = roc_curve(y_test_binarized[:, 1], probabilidade_positivo_classe[:,1])
     auc_score = auc(taxa_fpr, taxa_tpr)
-
-    cross_val_results = cross_val_score(model, df_X, df_y, cv=5, scoring='accuracy')
-    print("Resultados da Validacao Cruzada:", cross_val_results)
-    print("Precisão Média: {:.2f}%".format(cross_val_results.mean() * 100))
     print("Acurácia da área sob a curva (ROC):", auc_score)
     print("\n")
 
@@ -49,31 +45,47 @@ def curva_roc(model, df_X, df_y, df_X_test, df_y_test):
     plt.legend()
     plt.show()
 
+def validacao_cruzada(model, df_X, df_y):
+    cross_val_results = cross_val_score(model, df_X, df_y, cv=5, scoring='accuracy')
+    print("Resultados da Validacao Cruzada:", cross_val_results)
+    print("Precisão Média: {:.2f}%".format(cross_val_results.mean() * 100))
+
 valores_C = [0.1, 1, 10]
 valores_gamma = [0.01, 0.1, 1]
 
-kernels = ['linear', 'rbf', 'poly']
-for kernel in kernels:
-    print(f"\nKernel: {kernel}\n")
-    
-    for C in valores_C:
+def svm():
+    kernels = ['linear', 'rbf', 'poly']
+    for kernel in kernels:
+        print(f"\nKernel: {kernel}\n")
         
-        if kernel in ['rbf', 'poly']:
-            for gamma in valores_gamma:
-                modelo = SVC(kernel=kernel, C=C, gamma=gamma, probability=True)
+        for C in valores_C:
+            
+            if kernel in ['rbf', 'poly']:
+                for gamma in valores_gamma:
+                    modelo = SVC(kernel=kernel, C=C, gamma=gamma, probability=True)
+                    modelo.fit(X_train, y_train)
+                    y_pred = modelo.predict(X_test)
+
+                    print(f"C={C}, gamma={gamma}:")
+                    #validacao(y_test, y_pred)
+                    curva_roc(modelo, X, y, X_test, y_test)
+            else:
+                modelo = SVC(kernel=kernel, C=C, probability=True)
                 modelo.fit(X_train, y_train)
                 y_pred = modelo.predict(X_test)
 
-                print(f"C={C}, gamma={gamma}:")
-                validacao(y_test, y_pred)
+                print(f"C={C}:")
+                #validacao(y_test, y_pred)
                 curva_roc(modelo, X, y, X_test, y_test)
-        else:
-            modelo = SVC(kernel=kernel, C=C, probability=True)
-            modelo.fit(X_train, y_train)
-            y_pred = modelo.predict(X_test)
 
-            print(f"C={C}:")
-            validacao(y_test, y_pred)
-            curva_roc(modelo, X, y, X_test, y_test)
+#svm()
 
+def novo_svm():
+    modelo = SVC(gamma='auto')
+    modelo.fit(X_train, y_train)
+    ac = modelo.score(X_test, y_test)
+    print(ac)
+    validacao_cruzada(modelo, X, y)
+
+novo_svm()
 
