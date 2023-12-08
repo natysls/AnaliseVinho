@@ -23,7 +23,7 @@ inertia_values = []
 def kmeans(n_cluster_a, n_cluster_b):
     for k in [n_cluster_a, n_cluster_b]:
         kmeans = KMeans(n_clusters=k, n_init=10, random_state=42)
-        kmeans.fit(data_scaled)
+        kmeans.fit(X_pca)
         inertia = kmeans.inertia_
         print("Variância inter-cluster do k=", k, ":", inertia)
         inertia_values.append(inertia)
