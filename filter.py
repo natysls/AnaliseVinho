@@ -85,7 +85,7 @@ def validacao(df_y_test, df_y_pred):
     print(f'Acurácia: {acuracia:.4f}')
     print(f'Precisão: {precisao:.4f}')
     print(f'Recall: {recall:.4f}')
-    print(f'F-Score: {f1:.4f}\n')
+    print(f'F-Score: {f1:.4f}')
 
 
 def curva_roc(model, df_X_test, df_y_test):
