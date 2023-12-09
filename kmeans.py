@@ -4,10 +4,12 @@ from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 import filter
+import warnings
 
 data = pd.read_csv('wine.csv')
 data.replace("?", pd.NA, inplace=True)
 data = filter.toda_filtragem(data)
+y_true = data['Wine']
 data = data.drop('Wine', axis=1)
 
 # Padronizar os dados antes de aplicar o KMeans
@@ -20,13 +22,18 @@ X_pca = pca.fit_transform(data_scaled)
 
 inertia_values = []
 
+warnings.filterwarnings("ignore", category=UserWarning)
+
 def kmeans(n_cluster_a, n_cluster_b):
     for k in [n_cluster_a, n_cluster_b]:
         kmeans = KMeans(n_clusters=k, n_init=10, random_state=42)
-        kmeans.fit(X_pca)
+        y_pred = kmeans.fit_predict(X_pca)
+        
         inertia = kmeans.inertia_
         print("Variância inter-cluster do k=", k, ":", inertia)
         inertia_values.append(inertia)
+
+        filter.validacao(y_true, y_pred)
         
         plt.figure(figsize=(8, 6))
         plt.scatter(X_pca[:, 0], X_pca[:, 1], c=kmeans.labels_, cmap='viridis', edgecolor='k', s=50)
