@@ -17,10 +17,10 @@ pca = PCA(n_components=2)
 X_pca = pca.fit_transform(X)
 
 # eps (distância relativa à vizinhança)
-eps_values = [0.3, 0.5]
+eps_values = [0.3, 0.4]
 
 # min_samples (quantidade de amostras em uma vizinhança)
-min_samples_values = [5, 10]
+min_samples_values = [5, 6]
 
 fig, axes = plt.subplots(len(eps_values), len(min_samples_values), figsize=(12, 8), sharex=True, sharey=True)
 
@@ -30,12 +30,16 @@ for i, eps in enumerate(eps_values):
         dbscan = DBSCAN(eps=eps, min_samples=min_samples)
         y_pred = dbscan.fit_predict(X_pca)
 
+        print("EPS:", eps, "e Min Samples:", min_samples)
+        print("Rótulos previstos:", y_pred)
+
         axes[i, j].scatter(X_pca[:, 0], X_pca[:, 1], c=y_pred, cmap='viridis', s=50, edgecolor='k')
+        axes[i, j].scatter(dbscan.components_[:, 0], dbscan.components_[:, 1], marker='*', s=20, color='red')
+
         axes[i, j].set_title(f'DBSCAN (eps={eps}, min_samples={min_samples})')
 
-        #silhouette_avg = silhouette_score(X_pca, y_pred)
-
-        #print(f'Silhouette Score: {silhouette_avg}')
+        silhouette_avg = silhouette_score(X_pca, y_pred)
+        print(f'Silhouette Score: {silhouette_avg}')
 
 
 plt.tight_layout()
